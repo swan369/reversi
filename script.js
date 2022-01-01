@@ -1078,6 +1078,8 @@ const comInitialStart = () => {
 
 // step 1, turn on ALL hardcoded buttons
 const main = () => {
+  const vid = document.getElementById("sound1");
+  vid.volume = 0.15;
   //PVP button
   $(".pvp").on("click", pvpInitialStart);
 

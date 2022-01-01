@@ -38,6 +38,12 @@ body {
   height: 50px;
 }
 
+.title {
+  font-family: "Monoton", cursive;
+  font-size: 100px;
+  margin-bottom: 0;
+}
+
 .pvp {
   background-color: red;
   color: white;
