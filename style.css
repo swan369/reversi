@@ -10,6 +10,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  /* justify-content: space-between; */
   align-items: center;
   text-align: center;
   gap: 20px;
@@ -37,10 +38,6 @@ body {
   height: 50px;
 }
 
-.container-header {
-  display: flex;
-}
-
 .pvp {
   background-color: red;
   color: white;
@@ -59,4 +56,10 @@ body {
 .submit {
   background-color: orange;
   color: white;
+}
+
+.container-header {
+  width: 300px;
+  display: flex;
+  justify-content: space-between;
 }

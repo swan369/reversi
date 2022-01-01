@@ -27,7 +27,7 @@ const anyMoreMoves = (valid) => {
   if (valid === false) {
     //game ends
     $(".output").text(
-      "Are you sure there is no more moves !?!?. Open your eyes please !"
+      "Are you sure there are no more moves !?!?. Open your eyes please !"
     );
     countScores(grid);
   }
@@ -47,7 +47,7 @@ const isEndGame = (isSquares, isAdjTile) => {
       finalMSG = `${blackName} wins. `;
     }
 
-    finalMSG += "The game has ended, please press reset to start new";
+    finalMSG += "The game has ended, please press reset to start anew";
     displayOutput(finalMSG);
   }
 };
@@ -151,12 +151,15 @@ const initGame = () => {
   whiteScore = 2;
   blackScore = 2;
   whiteNameTurn = false;
-  playing = false;
   mode = "";
+  // username = true;
+  // whiteNameTurn = true;
   username = false;
   ENDGAME = false;
   whiteName = "";
   blackName = "";
+  jackpot = false;
+  playing = false;
 
   grid = [
     ["", "", "", "", "", "", "", ""],
@@ -172,7 +175,7 @@ const initGame = () => {
   $(".row").remove();
   $(".output").text("Select PVP or Computer Mode to begin");
   $(".B").text("");
-  $(".W").text("REVERSI");
+  $(".W").text("");
   $(".X").text("");
   $(".O").text("");
   // ====== initialisation of initial buttons listeners=====
@@ -180,15 +183,16 @@ const initGame = () => {
   $(".pvp").on("click", pvpInitialStart);
   $(".computer").on("click", comInitialStart);
   // submit button
-  $(".submit").on("click", () => {
-    const $input = $(".input");
-    const $outputMainMsg = mainMessage($input.val());
-    console.log($outputMainMsg);
-    displayOutput($outputMainMsg);
-    $input.val("");
-  });
-  // start button
-  $(".start").on("click", initGame);
+  // $(".submit").on("click", () => {
+  //   const $input = $(".input");
+  //   const $outputMainMsg = mainMessage($input.val());
+  //   console.log($outputMainMsg);
+  //   displayOutput($outputMainMsg);
+  //   $input.val("");
+  // });
+  // reset button
+  $(".reset").on("click", initGame);
+  $(".submit").off();
 
   // =========end of initial buttons listners==========
 };
@@ -227,8 +231,17 @@ const pvpInitialStart = () => {
   username = true;
   whiteNameTurn = true;
   displayOutput(outputMsg);
+  $(".reset").on("click", initGame);
+  $(".computer").off();
+  $(".submit").on("click", () => {
+    const $input = $(".input");
+    const $outputMainMsg = mainMessage($input.val());
+    // console.log($outputMainMsg);
+    displayOutput($outputMainMsg);
+    $input.val("");
+  });
 };
-// ###============ COMPUTER AI functions begin =============
+
 const searchEmptySpots = (grid) => {
   const emptySpotsArr = [];
   let isSpot = false;
@@ -493,7 +506,7 @@ const isComputerValidEnd = (isArrObj, x, y) => {
   return finale;
 };
 
-// ###======== COMPUTER AI functions ends ==================
+// ###======== COMPUTER AI
 // step 6 in step 4.1 activePlayer selected tile is changed to activePlayer's color === the end
 const tileChangePlayer = (
   $isValid,
@@ -980,7 +993,7 @@ const tilesListenOn = () => {
 
 //step 3
 const mainMessage = (input) => {
-  let output = "invalid choice";
+  let myMessage = "invalid choice";
   if (username === true && mode === "pvp") {
     // console.log(whiteNameTurn);
     // console.log(input);
@@ -991,19 +1004,22 @@ const mainMessage = (input) => {
       $(".W").text(whiteName);
       whiteNameTurn = false;
       // console.log(output);
-      output = "Black player, input your name";
-      console.log(output);
+      const blackNameInput = "Black player, input your name";
+      myMessage = blackNameInput;
+      console.log("blackname issues");
+      console.log(blackNameInput);
     } else if (input !== "" && whiteNameTurn === false) {
       // console.log("came into black name");
       username = false;
       blackName = input;
       $(".B").text(blackName);
       $(".submit").off();
-      output = `${whiteName} start playing`;
+      myMessage = `${whiteName} start playing. You are White`;
       playing = true;
     }
     console.log(mode, username);
     if (mode === "pvp" && username === false) {
+      console.log("I was here");
       tilesCreate(grid); // render tiles
       tilesListenOn(); // turn on tiles listener
       whiteNameTurn = false;
@@ -1026,7 +1042,7 @@ const mainMessage = (input) => {
       $(".W").text(whiteName);
       blackName = "computer";
       $(".B").text("Computer");
-      output = `Game starts. ###${whiteName}###, as white player, you go first `;
+      myMessage = `Game starts. ###${whiteName}###, as white player, you go first `;
       playing = true;
     }
     if (mode === "computer" && username === false) {
@@ -1039,7 +1055,7 @@ const mainMessage = (input) => {
     }
   }
 
-  return output;
+  return myMessage;
 };
 
 //step 2 // ask white player to input name // turn on mode- computer
@@ -1049,6 +1065,15 @@ const comInitialStart = () => {
   username = true;
   whiteNameTurn = true;
   displayOutput(outputMsg);
+  $(".reset").on("click", initGame);
+  $(".pvp").off();
+  $(".submit").on("click", () => {
+    const $input = $(".input");
+    const $outputMainMsg = mainMessage($input.val());
+    // console.log($outputMainMsg);
+    displayOutput($outputMainMsg);
+    $input.val("");
+  });
 };
 
 // step 1, turn on ALL hardcoded buttons
@@ -1057,15 +1082,15 @@ const main = () => {
   $(".pvp").on("click", pvpInitialStart);
 
   // submit button
-  $(".submit").on("click", () => {
-    const $input = $(".input");
-    const $outputMainMsg = mainMessage($input.val());
-    // console.log($outputMainMsg);
-    displayOutput($outputMainMsg);
-    $input.val("");
-  });
+  // $(".submit").on("click", () => {
+  //   const $input = $(".input");
+  //   const $outputMainMsg = mainMessage($input.val());
+  //   // console.log($outputMainMsg);
+  //   displayOutput($outputMainMsg);
+  //   $input.val("");
+  // });
   // start button
-  $(".start").on("click", initGame);
+  // $(".reset").on("click", initGame);
 
   // computer button
   $(".computer").on("click", comInitialStart);
