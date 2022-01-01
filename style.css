@@ -2,7 +2,6 @@
   display: flex;
   width: 550px;
   justify-content: space-between;
-  /* align-content: center; */
   margin-bottom: 2px;
 }
 
@@ -11,15 +10,10 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* align-content: center; */
   align-items: center;
   text-align: center;
   gap: 20px;
 }
-
-/* .container-main {
-    background-color: white;
-  } */
 
 .tile {
   width: 65px;
@@ -29,13 +23,11 @@ body {
   color: red;
 }
 .white {
-  /* background-color: white; */
   background-image: url("white.jpg");
   background-size: 100%;
 }
 
 .black {
-  /* background-color: black; */
   background-image: url("black.jpg");
   background-size: 100%;
 }
@@ -56,5 +48,15 @@ body {
 
 .computer {
   background-color: blue;
+  color: white;
+}
+
+.reset {
+  background-color: rgb(99, 67, 193);
+  color: white;
+}
+
+.submit {
+  background-color: orange;
   color: white;
 }

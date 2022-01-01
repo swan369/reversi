@@ -27,11 +27,29 @@ const anyMoreMoves = (valid) => {
   if (valid === false) {
     //game ends
     $(".output").text(
-      "Click incorrectly or either player has no moves moves ? if so, game over"
+      "Are you sure there is no more moves !?!?. Open your eyes please !"
     );
     countScores(grid);
   }
   return isValid;
+};
+const isEndGame = (isSquares, isAdjTile) => {
+  countScores(grid);
+
+  if (isSquares === false || isAdjTile === false || ENDGAME === true) {
+    // ENDGAME = true;
+    let finalMSG = "";
+    if (whiteScore > blackScore) {
+      finalMSG = `${whiteName} wins. `;
+    } else if (whiteScore === blackScore) {
+      finalMSG = "It is a draw ";
+    } else {
+      finalMSG = `${blackName} wins. `;
+    }
+
+    finalMSG += "The game has ended, please press reset to start new";
+    displayOutput(finalMSG);
+  }
 };
 
 const countScores = (grid) => {
@@ -53,7 +71,6 @@ const countScores = (grid) => {
 const randomNum = (arr) => {
   return Math.floor(Math.random() * arr.length);
 };
-// const gridNum = [["X"], "O", "X", "X", "O"];
 
 const shuffleDeck = (arr) => {
   const randomNumber = function (dice) {
@@ -92,7 +109,7 @@ const tilesCreate = (grid) => {
       //respective row hooks a $TILE
       $(`.${i}row`).append($TILE);
 
-      $TILE.text(`${i},${j}`);
+      // $TILE.text(`${i},${j}`);
     }
   }
   //set initial tiles colors
@@ -196,9 +213,9 @@ const updateGrid = (x, y, player) => {
   // console.log(grid[x][y]);
 };
 
-const gridValue = (x, y) => {
-  return grid[x][y];
-};
+// const gridValue = (x, y) => {
+//   return grid[x][y];
+// };
 
 const displayOutput = (message) => {
   $(".output").text(message);
@@ -211,7 +228,272 @@ const pvpInitialStart = () => {
   whiteNameTurn = true;
   displayOutput(outputMsg);
 };
+// ###============ COMPUTER AI functions begin =============
+const searchEmptySpots = (grid) => {
+  const emptySpotsArr = [];
+  let isSpot = false;
 
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid.length; j++) {
+      const element = grid[i][j];
+      if (element === "") {
+        // console.log(grid[i][j]);
+        emptySpotsArr.push([i, j]);
+        isSpot = true;
+      }
+    }
+  }
+
+  return { isEmpty: isSpot, spotsArr: emptySpotsArr };
+};
+
+const isArrValidAdjacent = (isArrObjEmpty) => {
+  let isAdjacent = false;
+  const isEmpty = isArrObjEmpty.isEmpty;
+  const spotArr = isArrObjEmpty.spotsArr;
+  const validAdjArr = [];
+  const dirArray = [];
+  if (isEmpty === true) {
+    for (let i = 0; i < spotArr.length; i++) {
+      let eleIarr = spotArr[i]; // [i,j]
+
+      // console.log("eleIarr :", eleIarr);
+      const [x, y] = eleIarr;
+      const isArrDirectObj = directionFinder(x, y);
+      if (isArrDirectObj.validDirect === true) {
+        validAdjArr.push([x, y]);
+        dirArray.push(isArrDirectObj.direction);
+        isAdjacent = true;
+      }
+      // console.log(isArrDirectObj);
+    }
+  }
+  // console.log(validAdjArr);
+  return {
+    isAdj: isAdjacent,
+    adjArr: validAdjArr,
+    directArr: dirArray,
+  };
+};
+
+const isCheckCorners = (isValid, startX, startY) => {
+  console.log("pos startXandY: ", startX, startY);
+  let isGoodSpot = false;
+  if (isValid === true) {
+    console.log(
+      "inCheckCorners and checking whether StartX n StartY = corners"
+    );
+    const goodSpots = [
+      [0, 0],
+      [0, 7],
+      [7, 0],
+      [7, 7],
+    ];
+
+    isGoodSpot = goodSpots.some((item) => {
+      const a = item;
+      const b = [startX, startY];
+
+      function arrayEquals(a, b) {
+        return (
+          Array.isArray(a) &&
+          Array.isArray(b) &&
+          a.length === b.length &&
+          a.every((val, index) => val === b[index])
+        );
+      }
+
+      const isEqual = arrayEquals(a, b); // true, the function works
+      if (isEqual) {
+        return isEqual;
+      }
+    });
+  }
+  return isGoodSpot;
+};
+
+const loopEachCoor = (isArrObj) => {
+  let cornerFirst = false;
+  let valid = { valid: false };
+
+  console.log(isArrObj);
+  const possibleCoorArr = isArrObj.adjArr;
+  console.log(possibleCoorArr);
+
+  const deck = shuffleDeck(possibleCoorArr);
+
+  if (jackpot === false && cornerFirst === false) {
+    for (let i = 0; i < deck.length; i++) {
+      const item = deck.pop();
+      // const item = possibleCoorArr[randomNum(possibleCoorArr)];
+      const [x, y] = item;
+
+      const oneCoorChkObj = isComputerValidEnd(isArrObj, x, y);
+      console.log(oneCoorChkObj);
+
+      if (jackpot === true) {
+        return oneCoorChkObj; // returns true and the player's beginning tile to flip to own color
+      }
+    }
+  }
+  return valid;
+};
+
+const isComputerValidEnd = (isArrObj, x, y) => {
+  const finale = { valid: false };
+
+  let startX = x;
+  let startY = y;
+
+  console.log(player, opponent);
+
+  const directionArr = [
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [1, -1],
+    [0, -1],
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+  ];
+
+  for (const item of directionArr) {
+    let lastDirectDone = false;
+    const [dX, dY] = item;
+
+    console.log("square 1 direction :", dX, dY);
+
+    const isValidCoor = (x, y, dX, dY) => {
+      // let isValidCoor = false;
+      console.log("start pos XY:", x, y);
+      startX = x;
+      startY = y;
+      let moveX = startX;
+      let moveY = startY;
+      let stepsXarr = [];
+      let stepsYarr = [];
+      let directX = dX;
+      let directY = dY;
+
+      if (directX === -1 && directY === 1) {
+        console.log("I am final direction");
+        lastDirectDone = true;
+      }
+
+      // must take first step into opposing square
+      moveX += directX;
+      moveY += directY;
+      console.log("current pos after 1st movement : ", moveX, moveY);
+      stepsXarr.push(moveX);
+      stepsYarr.push(moveY);
+      console.log("stepsArr: ", stepsXarr, stepsYarr);
+      // if (withinBoard(moveX, moveY) === false) {
+      //   continue;
+      // }
+      if (withinBoard(moveX, moveY)) {
+        console.log("was here line 704 after withinBoard");
+        while (grid[moveX][moveY] === opponent) {
+          console.log("was here line 706 after hitting opponent");
+          //second step // possible own tile
+          console.log("next movement:", moveX, moveY);
+          moveX += directX;
+          moveY += directY;
+          console.log("after movement:", moveX, moveY);
+          console.log("steps: ", stepsXarr, stepsYarr);
+
+          if (withinBoard(moveX, moveY) === false) {
+            break;
+          } else {
+            stepsXarr.push(moveX);
+            stepsYarr.push(moveY);
+            console.log("steps: ", stepsXarr, stepsYarr);
+            console.log("after movement plus:", moveX, moveY);
+          }
+
+          if (grid[moveX][moveY] === player) {
+            console.log("after movement plus hit own card:", moveX, moveY);
+            console.log("arrOfStepsToFlip", stepsXarr, stepsYarr);
+            return { valid: true, Xarr: stepsXarr, Yarr: stepsYarr };
+          }
+        }
+
+        moveX = startX;
+        moveY = startY;
+        stepsXarr = [];
+        stepsYarr = [];
+        console.log(
+          "didnt hit own card, hence reset for next direction to test"
+        );
+        console.log("pos reset :", moveX, moveY);
+        console.log("steps reset", stepsXarr, stepsYarr);
+      }
+      moveX = startX;
+      moveY = startY;
+      stepsXarr = [];
+      stepsYarr = [];
+      // }
+
+      return { valid: false };
+    };
+
+    const isValidCoorObj = isValidCoor(startX, startY, dX, dY);
+    console.log(isValidCoorObj);
+
+    const isGoodCorner = isCheckCorners(isValidCoorObj.valid, startX, startY);
+    console.log(isGoodCorner); // // checks whether startX and Start Y matches with good corners after passing VALIDITY confirm
+
+    //####### JACKPOT condition in here #######
+    const flipOpponentTiles = (isGoodCorner, Xarr, Yarr, isValidCoorObj) => {
+      console.log("it is ok if undefined: ", Xarr, Yarr);
+      console.log(isValidCoorObj);
+      let isValidMove = false;
+      if (isGoodCorner === true) {
+        jackpot = true; //#######JACKPOT########
+        console.log("gonna flip opp tiles in next line");
+        const isTilesFlipped = correctTilesToFlip(Xarr, Yarr, isGoodCorner);
+        console.log("hit jackpot with corner");
+        isValidMove = true;
+      } else if (isGoodCorner === false && isValidCoorObj === true) {
+        jackpot = true; //#######JACKPOT########
+        console.log("gonna flip opp tile next line");
+        console.log("hit jackpot with something");
+        const isTilesFlipped = correctTilesToFlip(Xarr, Yarr, isGoodCorner);
+
+        isValidMove = true;
+      }
+      stepsXarr = [];
+      stepsYarr = [];
+      return isValidMove;
+    };
+    console.log(isValidCoorObj.valid);
+    const isFlippedOppTiles = flipOpponentTiles(
+      isGoodCorner,
+      isValidCoorObj.Xarr,
+      isValidCoorObj.Yarr,
+      isValidCoorObj.valid
+    );
+    console.log(isFlippedOppTiles);
+    console.log(
+      "check lastDirectionDone of final direct :",
+      lastDirectDone,
+      "jackpot :",
+      jackpot
+    );
+
+    if (jackpot === true && lastDirectDone === true) {
+      console.log("went pass into jackpot and lastDirectDone is true");
+      return { sX: startX, sY: startY };
+    }
+    console.log(
+      "shouldn't be in this line if jackpot and lastDirectDone is true"
+    );
+    // isValidMove = isFlippedOppTiles;
+  }
+  return finale;
+};
+
+// ###======== COMPUTER AI functions ends ==================
 // step 6 in step 4.1 activePlayer selected tile is changed to activePlayer's color === the end
 const tileChangePlayer = (
   $isValid,
@@ -609,293 +891,6 @@ const validMove = (x, y, validInitial, validFinal) => {
   return result;
 };
 
-// ===============TESTING AREA=================
-// search Emptry Spots
-const searchEmptySpots = (grid) => {
-  const emptySpotsArr = [];
-  let isSpot = false;
-
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid.length; j++) {
-      const element = grid[i][j];
-      if (element === "") {
-        // console.log(grid[i][j]);
-        emptySpotsArr.push([i, j]);
-        isSpot = true;
-      }
-    }
-  }
-
-  return { isEmpty: isSpot, spotsArr: emptySpotsArr };
-};
-
-const isArrValidAdjacent = (isArrObjEmpty) => {
-  let isAdjacent = false;
-  const isEmpty = isArrObjEmpty.isEmpty;
-  const spotArr = isArrObjEmpty.spotsArr;
-  const validAdjArr = [];
-  const dirArray = [];
-  if (isEmpty === true) {
-    for (let i = 0; i < spotArr.length; i++) {
-      let eleIarr = spotArr[i]; // [i,j]
-
-      // console.log("eleIarr :", eleIarr);
-      const [x, y] = eleIarr;
-      const isArrDirectObj = directionFinder(x, y);
-      if (isArrDirectObj.validDirect === true) {
-        validAdjArr.push([x, y]);
-        dirArray.push(isArrDirectObj.direction);
-        isAdjacent = true;
-      }
-      // console.log(isArrDirectObj);
-    }
-  }
-  // console.log(validAdjArr);
-  return {
-    isAdj: isAdjacent,
-    adjArr: validAdjArr,
-    directArr: dirArray,
-  };
-};
-// const isArrAdjacent = isArrValidAdjacent(isArrEmptySpots);
-// console.log(isArrAdjacent);
-
-const isCheckCorners = (isValid, startX, startY) => {
-  console.log("pos startXandY: ", startX, startY);
-  let isGoodSpot = false;
-  if (isValid === true) {
-    console.log(
-      "inCheckCorners and checking whether StartX n StartY = corners"
-    );
-    const goodSpots = [
-      [0, 0],
-      [0, 7],
-      [7, 0],
-      [7, 7],
-    ];
-
-    isGoodSpot = goodSpots.some((item) => {
-      const a = item;
-      const b = [startX, startY];
-
-      function arrayEquals(a, b) {
-        return (
-          Array.isArray(a) &&
-          Array.isArray(b) &&
-          a.length === b.length &&
-          a.every((val, index) => val === b[index])
-        );
-      }
-
-      const isEqual = arrayEquals(a, b); // true, the function works
-      if (isEqual) {
-        return isEqual;
-      }
-    });
-  }
-  return isGoodSpot;
-};
-
-const loopEachCoor = (isArrObj) => {
-  let cornerFirst = false;
-  let valid = { valid: false };
-
-  console.log(isArrObj);
-  const possibleCoorArr = isArrObj.adjArr;
-  console.log(possibleCoorArr);
-
-  const deck = shuffleDeck(possibleCoorArr);
-
-  if (jackpot === false && cornerFirst === false) {
-    for (let i = 0; i < deck.length; i++) {
-      const item = deck.pop();
-      // const item = possibleCoorArr[randomNum(possibleCoorArr)];
-      const [x, y] = item;
-
-      const oneCoorChkObj = isComputerValidEnd(isArrObj, x, y);
-      console.log(oneCoorChkObj);
-
-      if (jackpot === true) {
-        return oneCoorChkObj; // returns true and the player's beginning tile to flip to own color
-      }
-    }
-  }
-  return valid;
-};
-
-const isComputerValidEnd = (isArrObj, x, y) => {
-  const finale = { valid: false };
-
-  let startX = x;
-  let startY = y;
-
-  console.log(player, opponent);
-
-  const directionArr = [
-    [1, 0],
-    [1, 1],
-    [0, 1],
-    [1, -1],
-    [0, -1],
-    [-1, -1],
-    [-1, 0],
-    [-1, 1],
-  ];
-
-  for (const item of directionArr) {
-    let lastDirectDone = false;
-    const [dX, dY] = item;
-
-    console.log("square 1 direction :", dX, dY);
-
-    const isValidCoor = (x, y, dX, dY) => {
-      // let isValidCoor = false;
-      console.log("start pos XY:", x, y);
-      startX = x;
-      startY = y;
-      let moveX = startX;
-      let moveY = startY;
-      let stepsXarr = [];
-      let stepsYarr = [];
-      let directX = dX;
-      let directY = dY;
-
-      if (directX === -1 && directY === 1) {
-        console.log("I am final direction");
-        lastDirectDone = true;
-      }
-
-      // must take first step into opposing square
-      moveX += directX;
-      moveY += directY;
-      console.log("current pos after 1st movement : ", moveX, moveY);
-      stepsXarr.push(moveX);
-      stepsYarr.push(moveY);
-      console.log("stepsArr: ", stepsXarr, stepsYarr);
-      // if (withinBoard(moveX, moveY) === false) {
-      //   continue;
-      // }
-      if (withinBoard(moveX, moveY)) {
-        console.log("was here line 704 after withinBoard");
-        while (grid[moveX][moveY] === opponent) {
-          console.log("was here line 706 after hitting opponent");
-          //second step // possible own tile
-          console.log("next movement:", moveX, moveY);
-          moveX += directX;
-          moveY += directY;
-          console.log("after movement:", moveX, moveY);
-          console.log("steps: ", stepsXarr, stepsYarr);
-
-          if (withinBoard(moveX, moveY) === false) {
-            break;
-          } else {
-            stepsXarr.push(moveX);
-            stepsYarr.push(moveY);
-            console.log("steps: ", stepsXarr, stepsYarr);
-            console.log("after movement plus:", moveX, moveY);
-          }
-
-          if (grid[moveX][moveY] === player) {
-            console.log("after movement plus hit own card:", moveX, moveY);
-            console.log("arrOfStepsToFlip", stepsXarr, stepsYarr);
-            return { valid: true, Xarr: stepsXarr, Yarr: stepsYarr };
-          }
-        }
-
-        moveX = startX;
-        moveY = startY;
-        stepsXarr = [];
-        stepsYarr = [];
-        console.log(
-          "didnt hit own card, hence reset for next direction to test"
-        );
-        console.log("pos reset :", moveX, moveY);
-        console.log("steps reset", stepsXarr, stepsYarr);
-      }
-      moveX = startX;
-      moveY = startY;
-      stepsXarr = [];
-      stepsYarr = [];
-      // }
-
-      return { valid: false };
-    };
-
-    const isValidCoorObj = isValidCoor(startX, startY, dX, dY);
-    console.log(isValidCoorObj);
-
-    const isGoodCorner = isCheckCorners(isValidCoorObj.valid, startX, startY);
-    console.log(isGoodCorner); // // checks whether startX and Start Y matches with good corners after passing VALIDITY confirm
-
-    //####### JACKPOT condition in here #######
-    const flipOpponentTiles = (isGoodCorner, Xarr, Yarr, isValidCoorObj) => {
-      console.log("it is ok if undefined: ", Xarr, Yarr);
-      console.log(isValidCoorObj);
-      let isValidMove = false;
-      if (isGoodCorner === true) {
-        jackpot = true; //#######JACKPOT########
-        console.log("gonna flip opp tiles in next line");
-        const isTilesFlipped = correctTilesToFlip(Xarr, Yarr, isGoodCorner);
-        console.log("hit jackpot with corner");
-        isValidMove = true;
-      } else if (isGoodCorner === false && isValidCoorObj === true) {
-        jackpot = true; //#######JACKPOT########
-        console.log("gonna flip opp tile next line");
-        console.log("hit jackpot with something");
-        const isTilesFlipped = correctTilesToFlip(Xarr, Yarr, isGoodCorner);
-
-        isValidMove = true;
-      }
-      stepsXarr = [];
-      stepsYarr = [];
-      return isValidMove;
-    };
-    console.log(isValidCoorObj.valid);
-    const isFlippedOppTiles = flipOpponentTiles(
-      isGoodCorner,
-      isValidCoorObj.Xarr,
-      isValidCoorObj.Yarr,
-      isValidCoorObj.valid
-    );
-    console.log(isFlippedOppTiles);
-    console.log(
-      "check lastDirectionDone of final direct :",
-      lastDirectDone,
-      "jackpot :",
-      jackpot
-    );
-
-    if (jackpot === true && lastDirectDone === true) {
-      console.log("went pass into jackpot and lastDirectDone is true");
-      return { sX: startX, sY: startY };
-    }
-    console.log(
-      "shouldn't be in this line if jackpot and lastDirectDone is true"
-    );
-    // isValidMove = isFlippedOppTiles;
-  }
-  return finale;
-};
-
-const isEndGame = (isSquares, isAdjTile) => {
-  countScores(grid);
-
-  if (isSquares === false || isAdjTile === false || ENDGAME === true) {
-    // ENDGAME = true;
-    let finalMSG = "";
-    if (whiteScore > blackScore) {
-      finalMSG = `${whiteName} wins. `;
-    } else if (whiteScore === blackScore) {
-      finalMSG = "It is a draw ";
-    } else {
-      finalMSG = `${blackName} wins. `;
-    }
-
-    finalMSG += "The game has ended, please press reset to start new";
-    displayOutput(finalMSG);
-  }
-};
-// ====================TESTING AREA ============
 // step 4.1 tilesListenOn- Callback function to determine TILE is valid
 const tileIsClicked = (event) => {
   if (playing === true) {
