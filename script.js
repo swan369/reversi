@@ -35,6 +35,8 @@ const anyMoreMoves = (valid) => {
 };
 
 const countScores = (grid) => {
+  blackScore = 0;
+  whiteScore = 0;
   for (const x of grid) {
     for (const y of x) {
       const element = y;
@@ -47,8 +49,6 @@ const countScores = (grid) => {
       }
     }
   }
-  blackScore = 0;
-  whiteScore = 0;
 };
 const randomNum = (arr) => {
   return Math.floor(Math.random() * arr.length);
@@ -112,23 +112,21 @@ const tilesCreate = (grid) => {
   // $("#tile32").addClass("white");
 };
 
-// init game function
+const anySquaresLeft = () => {
+  let isSquares = false;
 
-const endGame = () => {
-  let endGame = true;
   for (const x of grid) {
     for (const y of x) {
       const element = y;
       // console.log(element);
       if (element === "") {
-        endGame = false;
+        isSquares = true;
       }
     }
-  } // returns true of false
-
-  return endGame;
+  }
+  return isSquares;
 };
-
+// init game function
 const initGame = () => {
   player = "O";
   opponent = "X"; //computer is black
@@ -538,10 +536,10 @@ const validInitial = (x, y) => {
   return isValidInitial;
 };
 // step 5.0 // checks tile clicked is valid
-const validMove = (x, y, initialChk, validFinal) => {
+const validMove = (x, y, validInitial, validFinal) => {
   // console.log(player, opponent);
   // console.log(x, y);
-  const isInitial = initialChk(x, y);
+  const isInitial = validInitial(x, y);
   // console.log(isInitial);
   const result = validFinal(isInitial, x, y);
   // console.log(result);
@@ -643,24 +641,6 @@ const loopEachCoor = (isArrObj) => {
   const possibleCoorArr = isArrObj.adjArr;
   console.log(possibleCoorArr);
 
-  // for (const item of possibleCoorArr) {
-  //   const [x, y] = item;
-  //   const isGood = isCheckCorners(true, x, y);
-
-  //   if (isGood === true && jackpot === false) {
-  //     cornerFirst = true;
-
-  //     if (cornerFirst === true) {
-  //       const oneCoorChkObj = isComputerValidEnd(isArrObj, x, y);
-  //       console.log(oneCoorChkObj);
-
-  //       if (jackpot === true) {
-  //         return oneCoorChkObj; // returns true and the player's beginning tile to flip to own color
-  //       }
-  //     }
-  //   }
-  // }
-
   const deck = shuffleDeck(possibleCoorArr);
 
   if (jackpot === false && cornerFirst === false) {
@@ -676,34 +656,15 @@ const loopEachCoor = (isArrObj) => {
         return oneCoorChkObj; // returns true and the player's beginning tile to flip to own color
       }
     }
-
-    // for (const item of possibleCoorArr) {
-    //   const [x, y] = item;
-    //   console.log(item);
-    //   const oneCoorChkObj = isComputerValidEnd(isArrObj, x, y);
-    //   console.log(oneCoorChkObj);
-
-    //   if (jackpot === true) {
-    //     return oneCoorChkObj; // returns true and the player's beginning tile to flip to own color
-    //   }
-    // }
   }
   return valid;
 };
 
 const isComputerValidEnd = (isArrObj, x, y) => {
   const finale = { valid: false };
-  // let isComputerFlipTile = true;
 
-  // const directArr = isArrObj.directArr;
-  // let validAdjArr = isArrObj.adjArr;
-  // let isValidMove = false;
   let startX = x;
   let startY = y;
-
-  // console.log(isArrObj);
-  // console.log(validAdjArr);
-  // console.log(directArr);
 
   console.log(player, opponent);
 
@@ -853,6 +814,24 @@ const isComputerValidEnd = (isArrObj, x, y) => {
   return finale;
 };
 
+const isEndGame = (isSquares) => {
+  countScores(grid);
+
+  if (isSquares === false || ENDGAME === true) {
+    // ENDGAME = true;
+    let finalMSG = "";
+    if (whiteScore > blackScore) {
+      finalMSG = `${whiteName} wins. `;
+    } else if (whiteScore === blackScore) {
+      finalMSG = "It is a draw ";
+    } else {
+      finalMSG = `${blackName} wins `;
+    }
+
+    finalMSG += "The game has ended, please press reset to start new";
+    displayOutput(finalMSG);
+  }
+};
 // ====================TESTING AREA ============
 // step 4.1 tilesListenOn- Callback function to determine TILE is valid
 const tileIsClicked = (event) => {
@@ -873,7 +852,7 @@ const tileIsClicked = (event) => {
     console.log("was i here again");
 
     const $isValid = validMove($targetX, $targetY, validInitial, validFinal); // later validFinal
-    console.log($isValid);
+    console.log("anyValidMove: ", $isValid);
 
     const ANYMOREMOVES = anyMoreMoves($isValid);
 
@@ -889,8 +868,6 @@ const tileIsClicked = (event) => {
 
       const isArrValidEnd = loopEachCoor(isArrAdjacent);
       console.log(isArrValidEnd);
-      // const isArrValidEnd = isComputerValidEnd(isArrAdjacent);
-      // isArrValidEnd.isValid,
 
       tileChangePlayer(
         $isValid,
@@ -907,19 +884,11 @@ const tileIsClicked = (event) => {
       countScores(grid);
     }
     // =============COMPUTER AI ENDS============
-    // isEndgame checks
-    const ENDGAME = endGame();
-    if (ENDGAME === true) {
-      let finalMSG = "";
-      // if (whiteScore > blackScore) {
-      //   finalMSG = `${whiteName} wins`;
-      // } else {
-      //   finalMSG = `${blackName} wins`;
-      // }
-      finalMSG += "The game has ended, please press reset to start new";
-      displayOutput(finalMSG);
-      // initGame(ENDGAME);
-    }
+    //
+
+    const isSquares = anySquaresLeft();
+
+    isEndGame(isSquares); //ENDGAME and isSquares ? are determinant
   }
 };
 
