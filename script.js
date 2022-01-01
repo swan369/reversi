@@ -112,19 +112,20 @@ const tilesCreate = (grid) => {
   // $("#tile32").addClass("white");
 };
 
-const anySquaresLeft = () => {
-  let isSquares = false;
+const anySquaresLeft = (grid) => {
+  // const row = [0, 1, 2, 3, 4, 5, 6, 7];
+  // const column = [0, 1, 2, 3, 4, 5, 6, 7];
+  let isAdjTile = false;
 
-  for (const x of grid) {
-    for (const y of x) {
-      const element = y;
-      // console.log(element);
-      if (element === "") {
-        isSquares = true;
+  for (let i = 0; i < grid.length; i++) {
+    let row = grid[i];
+    for (let j = 0; j < row.length; j++) {
+      if (grid[i][j] === "") {
+        return true;
       }
     }
   }
-  return isSquares;
+  return isAdjTile;
 };
 // init game function
 const initGame = () => {
@@ -400,7 +401,69 @@ const directionFinder = (x, y) => {
   // spotBlack: blackArray
   return { direction: directionArray, validDirect: isDirect };
 };
-// step 5.2 Final Check
+
+// step 5.2 Final Check (validFinal for Begin Check and validFinalTwo for End Check)
+const validFinalTwo = (isValidInitial, x, y) => {
+  let isValidMove = false; //default
+
+  if (isValidInitial === true) {
+    const directionObj = directionFinder(x, y);
+    const directArr = directionObj.direction;
+    for (const direct of directArr) {
+      let moveX = x;
+      let moveY = y;
+      let directX = 0;
+      let directY = 0;
+
+      if (direct === "top") {
+        directX = -1;
+        directY = 0;
+      } else if (direct === "topLeft") {
+        directX = -1;
+        directY = -1;
+      } else if (direct === "topRight") {
+        directX = -1;
+        directY = 1;
+      } else if (direct === "left") {
+        directX = 0;
+        directY = -1;
+      } else if (direct === "right") {
+        directX = 0;
+        directY = 1;
+      } else if (direct === "bottomLeft") {
+        directX = 1;
+        directY = -1;
+      } else if (direct === "bottom") {
+        directX = 1;
+        directY = 0;
+      } else if (direct === "bottomRight") {
+        directX = 1;
+        directY = 1;
+      }
+
+      // must take first step into opposing square
+      moveX += directX;
+      moveY += directY;
+
+      while (grid[moveX][moveY] === opponent) {
+        //second step // possible own tile
+        moveX += directX;
+        moveY += directY;
+
+        if (withinBoard(moveX, moveY) === false) {
+          break;
+        }
+
+        if (grid[moveX][moveY] === player) {
+          isValidMove = true;
+        }
+      }
+    }
+  }
+
+  return isValidMove;
+};
+
 const validFinal = (isValidInitial, x, y) => {
   let isValidMove = false; //default
   console.log(isValidInitial);
@@ -532,7 +595,7 @@ const validInitial = (x, y) => {
     }
   }
   // console.log(player, opponent);
-  console.log(isValidInitial);
+  // console.log(isValidInitial);
   return isValidInitial;
 };
 // step 5.0 // checks tile clicked is valid
@@ -814,10 +877,10 @@ const isComputerValidEnd = (isArrObj, x, y) => {
   return finale;
 };
 
-const isEndGame = (isSquares) => {
+const isEndGame = (isSquares, isAdjTile) => {
   countScores(grid);
 
-  if (isSquares === false || ENDGAME === true) {
+  if (isSquares === false || isAdjTile === false || ENDGAME === true) {
     // ENDGAME = true;
     let finalMSG = "";
     if (whiteScore > blackScore) {
@@ -825,7 +888,7 @@ const isEndGame = (isSquares) => {
     } else if (whiteScore === blackScore) {
       finalMSG = "It is a draw ";
     } else {
-      finalMSG = `${blackName} wins `;
+      finalMSG = `${blackName} wins. `;
     }
 
     finalMSG += "The game has ended, please press reset to start new";
@@ -885,10 +948,33 @@ const tileIsClicked = (event) => {
     }
     // =============COMPUTER AI ENDS============
     //
+    const lastChk = (grid) => {
+      console.log(grid);
+      const row = [0, 1, 2, 3, 4, 5, 6, 7];
+      const column = [0, 1, 2, 3, 4, 5, 6, 7];
+      let isAdjTile = false;
 
-    const isSquares = anySquaresLeft();
+      for (let i = 0; i < row.length; i++) {
+        for (let j = 0; j < column.length; j++) {
+          if (grid[i][j] === "") {
+            const isValid = validInitial(i, j);
+            const finale = validFinalTwo(isValid, i, j);
+            console.log(finale);
+            if (finale === true) {
+              return finale;
+            }
+          }
+        }
+      }
+      return isAdjTile;
+    };
 
-    isEndGame(isSquares); //ENDGAME and isSquares ? are determinant
+    const isAdjTile = lastChk(grid);
+    console.log(isAdjTile);
+    const isEmptySquares = anySquaresLeft(grid);
+    console.log(isEmptySquares);
+
+    isEndGame(isEmptySquares, isAdjTile);
   }
 };
 
