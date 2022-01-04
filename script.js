@@ -30,7 +30,7 @@ const anyMoreMoves = (valid) => {
     $(".output").text(
       "Are you sure there are no more moves !?!?. Open your eyes please !"
     );
-    countScores(grid);
+    // countScores(grid);
   }
   return isValid;
 };
@@ -114,25 +114,13 @@ const tilesCreate = (grid) => {
     }
   }
   //set initial tiles colors
-  // $(".tile").on("click", tileIsClicked);
   $("#tile43").addClass("black");
   $("#tile34").addClass("black");
   $("#tile33").addClass("white");
   $("#tile44").addClass("white");
-  // $("#tile11").addClass("white");
-  // $("#tile00").addClass("white");
-  // $("#tile20").addClass("black");
-  // $("#tile12").addClass("white");
-
-  // $("#tile22").addClass("black");
-  // $("#tile21").addClass("black");
-  // $("#tile53").addClass("black");
-  // $("#tile32").addClass("white");
 };
 
 const anySquaresLeft = (grid) => {
-  // const row = [0, 1, 2, 3, 4, 5, 6, 7];
-  // const column = [0, 1, 2, 3, 4, 5, 6, 7];
   let isAdjTile = false;
 
   for (let i = 0; i < grid.length; i++) {
@@ -153,8 +141,6 @@ const initGame = () => {
   blackScore = 2;
   whiteNameTurn = false;
   mode = "";
-  // username = true;
-  // whiteNameTurn = true;
   username = false;
   ENDGAME = false;
   whiteName = "";
@@ -183,18 +169,9 @@ const initGame = () => {
   //pvp button
   $(".pvp").on("click", pvpInitialStart);
   $(".computer").on("click", comInitialStart);
-  // submit button
-  // $(".submit").on("click", () => {
-  //   const $input = $(".input");
-  //   const $outputMainMsg = mainMessage($input.val());
-  //   console.log($outputMainMsg);
-  //   displayOutput($outputMainMsg);
-  //   $input.val("");
-  // });
   // reset button
   $(".reset").on("click", initGame);
   $(".submit").off();
-
   // =========end of initial buttons listners==========
 };
 
@@ -205,15 +182,10 @@ const withinBoard = (moveX, moveY) =>
 const togglePlayer = () => {
   player = player === "O" ? "X" : "O";
   opponent = opponent === "X" ? "O" : "X";
-  // console.log("currentPlayer: ", player, "currentOpponent: ", opponent);
 };
 
 const updateGrid = (x, y, player) => {
-  // console.log("update grid: ", x, y);
-  // console.log(player);
-
   grid[x][y] = player;
-  // console.log(grid[x][y]);
 };
 
 const displayOutput = (message) => {
@@ -231,7 +203,6 @@ const pvpInitialStart = () => {
   $(".submit").on("click", () => {
     const $input = $(".input");
     const $outputMainMsg = mainMessage($input.val());
-    // console.log($outputMainMsg);
     displayOutput($outputMainMsg);
     $input.val("");
   });
@@ -245,7 +216,6 @@ const searchEmptySpots = (grid) => {
     for (let j = 0; j < grid.length; j++) {
       const element = grid[i][j];
       if (element === "") {
-        // console.log(grid[i][j]);
         emptySpotsArr.push([i, j]);
         isSpot = true;
       }
@@ -265,7 +235,6 @@ const isArrValidAdjacent = (isArrObjEmpty) => {
     for (let i = 0; i < spotArr.length; i++) {
       let eleIarr = spotArr[i]; // [i,j]
 
-      // console.log("eleIarr :", eleIarr);
       const [x, y] = eleIarr;
       const isArrDirectObj = directionFinder(x, y);
       if (isArrDirectObj.validDirect === true) {
@@ -273,10 +242,8 @@ const isArrValidAdjacent = (isArrObjEmpty) => {
         dirArray.push(isArrDirectObj.direction);
         isAdjacent = true;
       }
-      // console.log(isArrDirectObj);
     }
   }
-  // console.log(validAdjArr);
   return {
     isAdj: isAdjacent,
     adjArr: validAdjArr,
@@ -323,21 +290,15 @@ const isCheckCorners = (isValid, startX, startY) => {
 const loopEachCoor = (isArrObj) => {
   let cornerFirst = false;
   let valid = { valid: false };
-
-  console.log(isArrObj);
   const possibleCoorArr = isArrObj.adjArr;
-  console.log(possibleCoorArr);
-
   const deck = shuffleDeck(possibleCoorArr);
 
   if (jackpot === false && cornerFirst === false) {
     for (let i = 0; i < deck.length; i++) {
       const item = deck.pop();
-      // const item = possibleCoorArr[randomNum(possibleCoorArr)];
       const [x, y] = item;
 
       const oneCoorChkObj = isComputerValidEnd(isArrObj, x, y);
-      console.log(oneCoorChkObj);
 
       if (jackpot === true) {
         return oneCoorChkObj; // returns true and the player's beginning tile to flip to own color
@@ -353,8 +314,6 @@ const isComputerValidEnd = (isArrObj, x, y) => {
   let startX = x;
   let startY = y;
 
-  console.log(player, opponent);
-
   const directionArr = [
     [1, 0],
     [1, 1],
@@ -369,12 +328,7 @@ const isComputerValidEnd = (isArrObj, x, y) => {
   for (const item of directionArr) {
     let lastDirectDone = false;
     const [dX, dY] = item;
-
-    console.log("square 1 direction :", dX, dY);
-
     const isValidCoor = (x, y, dX, dY) => {
-      // let isValidCoor = false;
-      console.log("start pos XY:", x, y);
       startX = x;
       startY = y;
       let moveX = startX;
@@ -385,89 +339,58 @@ const isComputerValidEnd = (isArrObj, x, y) => {
       let directY = dY;
 
       if (directX === -1 && directY === 1) {
-        console.log("I am final direction");
         lastDirectDone = true;
       }
 
       // must take first step into opposing square
       moveX += directX;
       moveY += directY;
-      console.log("current pos after 1st movement : ", moveX, moveY);
       stepsXarr.push(moveX);
       stepsYarr.push(moveY);
-      console.log("stepsArr: ", stepsXarr, stepsYarr);
-      // if (withinBoard(moveX, moveY) === false) {
-      //   continue;
-      // }
       if (withinBoard(moveX, moveY)) {
-        console.log("was here line 704 after withinBoard");
         while (grid[moveX][moveY] === opponent) {
-          console.log("was here line 706 after hitting opponent");
           //second step // possible own tile
-          console.log("next movement:", moveX, moveY);
           moveX += directX;
           moveY += directY;
-          console.log("after movement:", moveX, moveY);
-          console.log("steps: ", stepsXarr, stepsYarr);
 
           if (withinBoard(moveX, moveY) === false) {
             break;
           } else {
             stepsXarr.push(moveX);
             stepsYarr.push(moveY);
-            console.log("steps: ", stepsXarr, stepsYarr);
-            console.log("after movement plus:", moveX, moveY);
           }
 
           if (grid[moveX][moveY] === player) {
-            console.log("after movement plus hit own card:", moveX, moveY);
-            console.log("arrOfStepsToFlip", stepsXarr, stepsYarr);
             return { valid: true, Xarr: stepsXarr, Yarr: stepsYarr };
           }
         }
-
         moveX = startX;
         moveY = startY;
         stepsXarr = [];
         stepsYarr = [];
-        console.log(
-          "didnt hit own card, hence reset for next direction to test"
-        );
-        console.log("pos reset :", moveX, moveY);
-        console.log("steps reset", stepsXarr, stepsYarr);
       }
       moveX = startX;
       moveY = startY;
       stepsXarr = [];
       stepsYarr = [];
-      // }
 
       return { valid: false };
     };
 
     const isValidCoorObj = isValidCoor(startX, startY, dX, dY);
-    console.log(isValidCoorObj);
 
     const isGoodCorner = isCheckCorners(isValidCoorObj.valid, startX, startY);
-    console.log(isGoodCorner); // // checks whether startX and Start Y matches with good corners after passing VALIDITY confirm
 
     //####### JACKPOT condition in here #######
     const flipOpponentTiles = (isGoodCorner, Xarr, Yarr, isValidCoorObj) => {
-      console.log("it is ok if undefined: ", Xarr, Yarr);
-      console.log(isValidCoorObj);
       let isValidMove = false;
       if (isGoodCorner === true) {
         jackpot = true; //#######JACKPOT########
-        console.log("gonna flip opp tiles in next line");
         const isTilesFlipped = correctTilesToFlip(Xarr, Yarr, isGoodCorner);
-        console.log("hit jackpot with corner");
         isValidMove = true;
       } else if (isGoodCorner === false && isValidCoorObj === true) {
         jackpot = true; //#######JACKPOT########
-        console.log("gonna flip opp tile next line");
-        console.log("hit jackpot with something");
         const isTilesFlipped = correctTilesToFlip(Xarr, Yarr, isGoodCorner);
-
         isValidMove = true;
       }
       stepsXarr = [];
@@ -481,22 +404,10 @@ const isComputerValidEnd = (isArrObj, x, y) => {
       isValidCoorObj.Yarr,
       isValidCoorObj.valid
     );
-    console.log(isFlippedOppTiles);
-    console.log(
-      "check lastDirectionDone of final direct :",
-      lastDirectDone,
-      "jackpot :",
-      jackpot
-    );
 
     if (jackpot === true && lastDirectDone === true) {
-      console.log("went pass into jackpot and lastDirectDone is true");
       return { sX: startX, sY: startY };
     }
-    console.log(
-      "shouldn't be in this line if jackpot and lastDirectDone is true"
-    );
-    // isValidMove = isFlippedOppTiles;
   }
   return finale;
 };
@@ -516,39 +427,25 @@ const tileChangePlayer = (
   if ($isValid === true && mode === "pvp") {
     if (player === "O") {
       $target.toggleClass("white");
-      // $target.toggleClass("green");
-      console.log("was here as white");
       updateGrid($targetX, $targetY, player);
       togglePlayer();
       $(".output").text(`${blackName} your turn`);
-      // console.log("player", player);
-      // console.log("opponent", opponent);
     } else if (player === "X") {
-      console.log("was here for player2");
       $target.toggleClass("black");
-      // $target.toggleClass("green");
       updateGrid($targetX, $targetY, player);
       togglePlayer();
       displayOutput(`${whiteName} your turn`);
-      // console.log("player", player);
-      // console.log("opponent", opponent);
     }
   }
   console.log($isValid);
   if (mode === "computer") {
-    console.log($isValid);
     if (player === "O" && $isValid === true) {
       $target.toggleClass("white");
-      // console.log("white player computer mode");
-
       updateGrid($targetX, $targetY, player);
-      // console.log(opponent);
       togglePlayer();
-      // console.log(opponent);
       $(".output").text(`${blackName} your turn`);
     }
     if (player === "X" && jackpot === true) {
-      console.log("computerSpot2Flip: ", comStartX, comStartY);
       const $comTile = $(`#tile${comStartX}${comStartY}`);
       $comTile.toggleClass("black");
       updateGrid(comStartX, comStartY, player);
@@ -559,75 +456,51 @@ const tileChangePlayer = (
 };
 // step 5.2.3 // flip the tile
 const flipTile = (x, y) => {
-  console.log("player: ", player, "opponent: ", opponent);
-  // console.log(x, y);
   const gridValue = grid[x][y];
   const $tile = $(`#tile${x}${y}`);
 
   if (player === "O") {
-    // console.log($tile);
-    // console.log(`flipping ${x}${y}`);
     $tile.addClass("white");
     $tile.removeClass("black");
     updateGrid(x, y, player);
-    // console.log(grid[x][y]);
-    // console.log(player, opponent);
   } else if (player === "X") {
-    console.log("was here as black");
     $tile.addClass("black");
     $tile.removeClass("white");
     updateGrid(x, y, player);
-    // console.log(grid[x][y]);
-    // console.log(player, opponent);
   }
 };
 // step 5.2.2 // uses slices
 // FLIP TILE is INSIDE
 const correctTilesToFlip = (x, y, isCorner) => {
-  console.log(x, y);
   if (mode === "pvp") {
     const Xarr = x.slice(0, -1);
     const Yarr = y.slice(0, -1);
-    // const opponentTile = 2;
-    console.log("cardsToFlip: ", Xarr, Yarr);
 
-    //POTENTIAL PROBLEMS DUE TO WRONG READING HENCE FLIPPING
     for (let i = 0; i < Xarr.length; i++) {
       const elementX = Xarr[i];
       for (let j = i; j <= i; j++) {
         const elementY = Yarr[j];
-        console.log(elementX, elementY);
         flipTile(elementX, elementY); // grid updated and tiles except players is flipped
       }
     }
   }
   if (mode === "computer") {
-    // if (isComputerFlipTile === false) {
-    // }
     isComputerFlipTile = true;
     if (isComputerFlipTile === true) {
     }
     const Xarr = x.slice(0, -1);
     const Yarr = y.slice(0, -1);
-    // const opponentTile = 2;
-    console.log("IMPORTANT cardsToFlip: ", Xarr, Yarr);
 
-    //POTENTIAL PROBLEMS DUE TO WRONG READING HENCE FLIPPING
     // loops and flips all the required tiles in one go
     for (let i = 0; i < Xarr.length; i++) {
       const elementX = Xarr[i];
       for (let j = i; j <= i; j++) {
         const elementY = Yarr[j];
-        console.log(
-          "as Computer/white exact coordinates to flip b4 flip: ",
-          elementX,
-          elementY
-        );
+
         flipTile(elementX, elementY); // grid updated and tiles except players is flipped
       }
     }
   }
-  // computerFlipTile = false;
   return true;
 };
 // step 5.2.1 // finds "POTENTIAL" correct direction
@@ -635,8 +508,6 @@ const directionFinder = (x, y) => {
   let isDirect = false;
   const startX = x;
   const startY = y;
-  // console.log(x, y);
-  // const blackArray = [];
   const directionArray = [];
   const validArray = [
     [0, 1],
@@ -657,7 +528,6 @@ const directionFinder = (x, y) => {
     moveY += y;
     if (withinBoard(moveX, moveY)) {
       if (grid[moveX][moveY] === opponent) {
-        // console.log(moveX, moveY);
         // if move hits an opponent tile, it records to directionArray //but it's still ?? valid direction
 
         if (x === 0 && y === 1) {
@@ -756,20 +626,14 @@ const validFinalTwo = (isValidInitial, x, y) => {
 
 const validFinal = (isValidInitial, x, y) => {
   let isValidMove = false; //default
-  console.log(isValidInitial);
-  console.log(player, opponent);
-  console.log(x, y);
   if (isValidInitial === true) {
     const directionObj = directionFinder(x, y);
-    // console.log(directionObj);
     const directArr = directionObj.direction;
-    // console.log(directArr);
     for (const direct of directArr) {
       let moveX = x;
       let moveY = y;
       let directX = 0;
       let directY = 0;
-      // console.log("start position:", x, y);
       let stepsXarr = []; // collect X steps
       let stepsYarr = []; // collect Y steps
 
@@ -802,13 +666,8 @@ const validFinal = (isValidInitial, x, y) => {
       // must take first step into opposing square
       moveX += directX;
       moveY += directY;
-      // console.log("direction: ", directX, directY);
-      // console.log(moveX, moveY);
       stepsXarr.push(moveX);
       stepsYarr.push(moveY);
-      // if (withinBoard(moveX, moveY) === false) {
-      //   continue;
-      // }
       while (grid[moveX][moveY] === opponent) {
         //second step // possible own tile
         moveX += directX;
@@ -818,13 +677,7 @@ const validFinal = (isValidInitial, x, y) => {
         if (withinBoard(moveX, moveY) === false) {
           break;
         }
-        // console.log("I got into loop");
-
-        console.log("direction : ", directX, directY);
-        console.log("danger points :", moveX, moveY);
-
         if (grid[moveX][moveY] === player) {
-          // console.log("got in above reverseSteps");
           const test = correctTilesToFlip(stepsXarr, stepsYarr);
           stepsXarr = [];
           stepsYarr = [];
@@ -839,63 +692,44 @@ const validFinal = (isValidInitial, x, y) => {
 
 // step 5.1 Initial Check
 const validInitial = (x, y) => {
-  // console.log(player, opponent);
-  console.log(x, y);
   let isValidInitial = false;
   if (grid[x][y] === "") {
-    // console.log(x, y);
     const startX = x; //remember start X
     const startY = y; // remember start Y
 
     const validArray = [
-      [0, 1], //c
-      [1, 1], //c
-      [1, 0], //c
-      [1, -1], //c
-      [0, -1], //c
-      [-1, -1], //c
-      [-1, 0], //c
-      [-1, 1], //c
+      [0, 1],
+      [1, 1],
+      [1, 0],
+      [1, -1],
+      [0, -1],
+      [-1, -1],
+      [-1, 0],
+      [-1, 1],
     ];
 
     for (const item of validArray) {
       let moveX = startX;
       let moveY = startY;
       const [x, y] = item;
-      // console.log(x, y);
-
-      // console.log(moveX, moveY);
-      // console.log(moveX, moveY);
       moveX += x; // first steps into ?? opponent tile
       moveY += y; // first steps in ?? opponent tile
-      // while (withinBoard(moveX, moveY)) {
       if (withinBoard(moveX, moveY)) {
-        // console.log(moveX, moveY);
         if (grid[moveX][moveY] === "X" && player === "O") {
-          // console.log("checkingasWhite");
           isValidInitial = true;
         }
         if (grid[moveX][moveY] === "O" && player === "X") {
-          // console.log("checkingasBlack");
           isValidInitial = true;
         }
-        // moveX += x;
-        // moveY += y;
       }
     }
   }
-  // console.log(player, opponent);
-  // console.log(isValidInitial);
   return isValidInitial;
 };
 // step 5.0 // checks tile clicked is valid
 const validMove = (x, y, validInitial, validFinal) => {
-  // console.log(player, opponent);
-  // console.log(x, y);
   const isInitial = validInitial(x, y);
-  // console.log(isInitial);
   const result = validFinal(isInitial, x, y);
-  // console.log(result);
   return result;
 };
 
@@ -910,15 +744,10 @@ const tileIsClicked = (event) => {
 
     const $target = $(event.target);
     const $objXY = $target.data("coordinates");
-    // console.log($objXY);
     const $targetX = $objXY.x;
     const $targetY = $objXY.y;
-    // console.log($targetX, $targetY);
-
-    console.log("was i here again");
 
     const $isValid = validMove($targetX, $targetY, validInitial, validFinal); // later validFinal
-    console.log("anyValidMove: ", $isValid);
 
     const ANYMOREMOVES = anyMoreMoves($isValid);
 
@@ -930,10 +759,8 @@ const tileIsClicked = (event) => {
       const isArrEmptySpots = searchEmptySpots(grid);
 
       const isArrAdjacent = isArrValidAdjacent(isArrEmptySpots);
-      console.log(isArrAdjacent);
 
       const isArrValidEnd = loopEachCoor(isArrAdjacent);
-      console.log(isArrValidEnd);
 
       tileChangePlayer(
         $isValid,
@@ -950,9 +777,7 @@ const tileIsClicked = (event) => {
       countScores(grid);
     }
     // =============COMPUTER AI ENDS============
-    //
     const lastChk = (grid) => {
-      console.log(grid);
       const row = [0, 1, 2, 3, 4, 5, 6, 7];
       const column = [0, 1, 2, 3, 4, 5, 6, 7];
       let isAdjTile = false;
@@ -962,7 +787,6 @@ const tileIsClicked = (event) => {
           if (grid[i][j] === "") {
             const isValid = validInitial(i, j);
             const finale = validFinalTwo(isValid, i, j);
-            console.log(finale);
             if (finale === true) {
               return finale;
             }
@@ -971,12 +795,8 @@ const tileIsClicked = (event) => {
       }
       return isAdjTile;
     };
-
     const isAdjTile = lastChk(grid);
-    console.log(isAdjTile);
     const isEmptySquares = anySquaresLeft(grid);
-    console.log(isEmptySquares);
-
     isEndGame(isEmptySquares, isAdjTile);
   }
 };
@@ -988,23 +808,14 @@ const tilesListenOn = () => {
 
 //step 3
 const mainMessage = (input) => {
-  // let myMessage = "invalid choice";
   if (username === true && mode === "pvp") {
-    // console.log(whiteNameTurn);
-    // console.log(input);
     if (input !== "" && whiteNameTurn === true) {
-      // console.log("came in");
       whiteName = input;
-      // console.log(whiteName);
       $(".W").text(whiteName);
       whiteNameTurn = false;
-      // console.log(output);
       const blackNameInput = "Black player, input your name";
       myMessage = blackNameInput;
-      console.log("blackname issues");
-      console.log(blackNameInput);
     } else if (input !== "" && whiteNameTurn === false) {
-      // console.log("came into black name");
       username = false;
       blackName = input;
       $(".B").text(blackName);
@@ -1012,27 +823,20 @@ const mainMessage = (input) => {
       myMessage = `${whiteName} start playing. You are White`;
       playing = true;
     }
-    console.log(mode, username);
     if (mode === "pvp" && username === false) {
-      console.log("I was here");
       tilesCreate(grid); // render tiles
       tilesListenOn(); // turn on tiles listener
       whiteNameTurn = false;
-      // console.log(output);
       $(".X").text("0");
       $(".O").text("0");
       $(".pvp").off();
     }
-    // console.log(output);
   }
 
   if (username === true && mode === "computer") {
-    console.log(username);
     if (input !== "" && whiteNameTurn === true) {
-      console.log("came in and accepts white username");
       whiteName = input;
       whiteNameTurn === false;
-
       username = false;
       $(".W").text(whiteName);
       blackName = "computer";
@@ -1065,7 +869,6 @@ const comInitialStart = () => {
   $(".submit").on("click", () => {
     const $input = $(".input");
     const $outputMainMsg = mainMessage($input.val());
-    // console.log($outputMainMsg);
     displayOutput($outputMainMsg);
     $input.val("");
   });
@@ -1075,21 +878,10 @@ const comInitialStart = () => {
 const main = () => {
   // const vid = document.getElementById("sound1");
   // vid.volume = 0.1;
+
   //PVP button
   $(".pvp").on("click", pvpInitialStart);
-
-  // submit button
-  // $(".submit").on("click", () => {
-  //   const $input = $(".input");
-  //   const $outputMainMsg = mainMessage($input.val());
-  //   // console.log($outputMainMsg);
-  //   displayOutput($outputMainMsg);
-  //   $input.val("");
-  // });
-  // start button
-  // $(".reset").on("click", initGame);
-
-  // computer button
+  //computer button
   $(".computer").on("click", comInitialStart);
 };
 
