@@ -301,7 +301,7 @@ const isCheckCorners = (isValid, startX, startY) => {
     isGoodSpot = goodSpots.some((item) => {
       const a = item;
       const b = [startX, startY];
-
+      // reference for arrayEquals function : https://www.codegrepper.com/code-examples/javascript/how+to+check+if+two+arrays+are+equal+javascriptß
       function arrayEquals(a, b) {
         return (
           Array.isArray(a) &&
@@ -1073,8 +1073,8 @@ const comInitialStart = () => {
 
 // step 1, turn on ALL hardcoded buttons
 const main = () => {
-  const vid = document.getElementById("sound1");
-  vid.volume = 0.1;
+  // const vid = document.getElementById("sound1");
+  // vid.volume = 0.1;
   //PVP button
   $(".pvp").on("click", pvpInitialStart);
 
