@@ -10,6 +10,7 @@ let whiteName = "";
 let blackName = "";
 let jackpot = false;
 let playing = false;
+let myMessage = "invalid choice";
 
 let grid = [
   ["", "", "", "", "", "", "", ""],
@@ -88,7 +89,7 @@ const shuffleDeck = (arr) => {
   return deck;
 };
 
-// in step3
+// function in step3
 const tilesCreate = (grid) => {
   // builds single div representing a row that will hook many small divs each
   // outer loop creates x8 rows. Each row hooks x8 small TILES
@@ -197,8 +198,6 @@ const initGame = () => {
   // =========end of initial buttons listners==========
 };
 
-// function to test for valid move
-
 const withinBoard = (moveX, moveY) =>
   moveX >= 0 && moveX <= 7 && moveY >= 0 && moveY <= 7;
 
@@ -216,10 +215,6 @@ const updateGrid = (x, y, player) => {
   grid[x][y] = player;
   // console.log(grid[x][y]);
 };
-
-// const gridValue = (x, y) => {
-//   return grid[x][y];
-// };
 
 const displayOutput = (message) => {
   $(".output").text(message);
@@ -993,7 +988,7 @@ const tilesListenOn = () => {
 
 //step 3
 const mainMessage = (input) => {
-  let myMessage = "invalid choice";
+  // let myMessage = "invalid choice";
   if (username === true && mode === "pvp") {
     // console.log(whiteNameTurn);
     // console.log(input);
@@ -1079,7 +1074,7 @@ const comInitialStart = () => {
 // step 1, turn on ALL hardcoded buttons
 const main = () => {
   const vid = document.getElementById("sound1");
-  vid.volume = 0.15;
+  vid.volume = 0.1;
   //PVP button
   $(".pvp").on("click", pvpInitialStart);
 
